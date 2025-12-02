@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getMessage } from '../../helpers/messages/messagesUtil';
-import { MessagesKey } from "../../helpers/messages/messagesKey"
+import { MessagesKey } from '../../helpers/messages/messagesKey';
 import { IResultVM } from '../../helpers/view-model/result.vm';
 
 export abstract class BaseController {
@@ -94,8 +94,6 @@ export abstract class BaseController {
     return this.sendSuccess(res, vm);
   }
 
-
-  
   /**
    * Handles errors and sends an error response.
    * Now uses the message utility to fetch error messages based on request language.
@@ -105,6 +103,8 @@ export abstract class BaseController {
     res: Response,
     error: any,
     statusCode: number = 500,
+    stringCode: string = '',
+    details: any = {},
   ): Response {
     const errorMessage =
       error instanceof Error
@@ -112,6 +112,11 @@ export abstract class BaseController {
         : getMessage(req, MessagesKey.UNKNOWNERROR);
     const vm: IResultVM = {
       data: null,
+      error: {
+        code: `${statusCode} ${stringCode}`,
+        message: errorMessage,
+        details,
+      },
       message: errorMessage,
       isSuccess: false,
       status: statusCode,
@@ -125,6 +130,8 @@ export abstract class BaseController {
       res,
       new Error(getMessage(req, MessagesKey.BADREQUEST)),
       400,
+      MessagesKey.BADREQUEST,
+      {},
     );
   }
 
@@ -134,15 +141,7 @@ export abstract class BaseController {
       res,
       new Error(getMessage(req, MessagesKey.UNAUTHORIZED)),
       401,
-    );
-  }
-
-  protected sendErrorNotFound(req: Request, res: Response): Response {
-    return this.handleError(
-      req,
-      res,
-      new Error(getMessage(req, MessagesKey.NODATAFOUND)),
-      200,
+      MessagesKey.UNAUTHORIZED,
     );
   }
 

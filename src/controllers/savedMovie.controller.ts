@@ -52,19 +52,37 @@ export class SavedMovieController extends BaseController {
       return this.sendSuccessCreate(req, res, data);
     } catch (error) {
       if (error instanceof NotFoundError) {
-        return this.handleError(req, res, error.message, 404);
+        return this.handleError(req, res, error, 404, MessagesKey.NOT_FOUND);
       }
 
       if (error instanceof DuplicateSaveError) {
-        return this.handleError(req, res, error.message, 409);
+        return this.handleError(
+          req,
+          res,
+          error,
+          409,
+          MessagesKey.DUPLICATE_SAVE,
+        );
       }
 
       if (error instanceof UnavailableInCountryError) {
-        return this.handleError(req, res, error.message, 422);
+        return this.handleError(
+          req,
+          res,
+          error.message,
+          422,
+          MessagesKey.UNAVAILABLE_IN_COUNTRY,
+        );
       }
 
       if (error instanceof BadRequest) {
-        return this.handleError(req, res, error.message, 400);
+        return this.handleError(
+          req,
+          res,
+          error.message,
+          400,
+          MessagesKey.BAD_REQUEST,
+        );
       }
 
       return this.handleError(req, res, error, 500);
@@ -82,7 +100,17 @@ export class SavedMovieController extends BaseController {
       if (error instanceof NotFoundError) {
         return this.handleError(req, res, error.message, 404);
       }
-      
+
+      if (error instanceof BadRequest) {
+        return this.handleError(
+          req,
+          res,
+          error.message,
+          400,
+          MessagesKey.BAD_REQUEST,
+        );
+      }
+
       return this.handleError(req, res, error, 500);
     }
   }
