@@ -9,7 +9,7 @@
     "prisma:generate": "prisma generate",
     "migrate:create": "prisma migrate dev --create-only",
     "migrate": "prisma migrate deploy",
-    "reset": "prisma migrate reset",
+    "migrate:reset": "prisma migrate reset",
     "seed": "prisma db seed",
     "lint": "eslint",
     "lint:fix": "eslint src --fix && npm run format",

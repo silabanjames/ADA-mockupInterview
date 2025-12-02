@@ -15,18 +15,88 @@ datasource db {
 
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  posts     Post[]
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String
+  date_of_birth DateTime @db.Date
+
+  savedMovie SavedMovie[]
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
+model Genre {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @unique
+
+  movieGenres MovieGenre[]
+}
+
+model Movie {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title String
+  year Int
+
+  movieGenres MovieGenre[]
+  casts Cast[]
+  movieAvailabilities MovieAvailability[]
+  savedMovies SavedMovie[]
+
+  @@index([year])
+}
+
+model MovieGenre {
+  movieId String @db.Uuid
+  genreId String @db.Uuid
+
+  movie Movie @relation(fields: [movieId], references: [id])
+  genre Genre @relation(fields: [genreId], references: [id])
+
+  @@id([movieId, genreId])
+}
+
+model Actor {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String
+
+  casts Cast[]
+}
+
+model Cast {
+  movieId String @db.Uuid
+  actorId String @db.Uuid
+
+  movie Movie @relation(fields: [movieId], references: [id])
+  actor Actor @relation(fields: [actorId], references: [id])
+
+  @@id([movieId, actorId])
+}
+
+model Country {
+  code String @id @db.Char(2)
+  name String
+  
+  movieAvailabilities MovieAvailability[]
+}
+
+model MovieAvailability {
+  movieId String @db.Uuid
+  countryCode String @db.Char(2)
+
+  movie Movie @relation(fields: [movieId], references: [id])
+  country Country @relation(fields: [countryCode], references: [code])
+
+  @@id([movieId, countryCode])
+
+  @@index([countryCode, movieId])
+}
+
+model SavedMovie {
+  userId String @db.Uuid
+  movieId String @db.Uuid
+  dateAdded DateTime
+
+  user User @relation(fields: [userId], references: [id])
+  movie Movie @relation(fields: [movieId], references: [id])
+
+  @@id([userId, movieId])
+
+  @@index([userId, movieId])
 }
