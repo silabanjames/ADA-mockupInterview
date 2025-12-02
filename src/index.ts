@@ -1,16 +1,10 @@
 import 'dotenv/config';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
-import { PrismaClient } from '../generated/prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
 
 import genreRoute from './routes/genre.route';
 import movieRoute from './routes/movie.route';
 import savedMovieRoute from './routes/savedMovie.route';
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
 
 const app = express();
 

@@ -6,6 +6,7 @@ export const messages_id = {
   [MessagesKey.UNKNOWNERROR]: 'Terjadi kesalahan yang tidak diketahui',
   [MessagesKey.BADREQUEST]: 'Permintaan tidak valid.',
   [MessagesKey.UNAUTHORIZED]: 'Tidak terotorisasi.',
+  [MessagesKey.FORBIDDEN]: 'Tidak diizinkan.',
 
   // Common Success messages
   [MessagesKey.SUCCESSGET]: 'Data telah ditemukan.',

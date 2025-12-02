@@ -6,6 +6,7 @@ export const messages_en = {
   [MessagesKey.UNKNOWNERROR]: 'An unknown error occurred',
   [MessagesKey.BADREQUEST]: 'Bad request.',
   [MessagesKey.UNAUTHORIZED]: 'Unauthorized.',
+  [MessagesKey.FORBIDDEN]: 'Forbidden.',
 
   // Common Success messages
   [MessagesKey.SUCCESSGET]: 'Data has been found.',

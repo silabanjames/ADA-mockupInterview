@@ -1,10 +1,11 @@
-import { Router } from "express";
-import { GenreController } from "../controllers/genre.controller";
+import { Router } from 'express';
+import { GenreController } from '../controllers/genre.controller';
+import { verifyToken } from '../helpers/utility/verifyToken';
 
 const router = Router();
 const genreController = new GenreController();
 
-router.get('/', (req, res) =>
+router.get('/', verifyToken, (req, res) =>
   genreController.findAllGenres(req, res),
 );
 

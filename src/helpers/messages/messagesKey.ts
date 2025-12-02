@@ -4,6 +4,7 @@ export enum MessagesKey {
   UNKNOWNERROR = 'UNKNOWNERROR',
   BADREQUEST = 'BADREQUEST',
   UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
 
   // Common Success Messages
   SUCCESSGET = 'SUCCESSGET',
