@@ -4,7 +4,7 @@ import { getMessage } from '../messages/messagesUtil';
 import { MessagesKey } from '../messages/messagesKey';
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers['apiKey'] as string;
+  const token = req.headers['x-api-key'];
 
   if (!token) {
     return res

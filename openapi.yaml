@@ -1,0 +1,313 @@
+openapi: 3.0.3
+info:
+  title: Movie Discovery Service API
+  version: "1.0.0"
+  description: API for listing genres, movies, saving/removing saved movies.
+servers:
+  - url: http://localhost:3000
+    description: Local dev server
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Provide your API key in the `apiKey` header.
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number (1-based)
+    PageSizeParam:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 20
+        maximum: 100
+      description: Items per page (max 100)
+    CountryParam:
+      name: country
+      in: query
+      schema:
+        type: string
+        pattern: '^[A-Za-z]{2}$'
+      required: true
+      description: ISO-3166-1 alpha-2 country code
+    GenreIdParam:
+      name: genre
+      in: query
+      schema:
+        type: string
+        format: uuid
+      description: Genre id (UUID)
+    UserIdParam:
+      name: user_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+      description: User id (UUID)
+    MovieIdParam:
+      name: movie_id
+      in: query
+      schema:
+        type: string
+        format: uuid
+      description: Movie id (UUID)
+
+  schemas:
+    Genre:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required: [id, name]
+
+    MovieItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        year:
+          type: integer
+      required: [id, title, year]
+
+    PagedResponseOfGenres:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+        meta:
+          type: object
+          properties:
+            page:
+              type: integer
+            page_size:
+              type: integer
+            total:
+              type: integer
+            total_pages:
+              type: integer
+
+    PagedResponseOfMovies:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieItem'
+        meta:
+          type: object
+          properties:
+            page:
+              type: integer
+            page_size:
+              type: integer
+            total:
+              type: integer
+            total_pages:
+              type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+  responses:
+    400BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    401Unauthorized:
+      description: Unauthorized (missing/invalid apiKey)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    404NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    409ConflictDuplicateSave:
+      description: Duplicate save (user already saved the movie)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    422UnprocessableEntityUnavailable:
+      description: Movie not available in country
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+paths:
+  /api/genre:
+    get:
+      summary: List genres
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+      responses:
+        '200':
+          description: Paged list of genres
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResponseOfGenres'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+
+  /api/movie:
+    get:
+      summary: List movies available in a country (optionally filter by genre)
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CountryParam'
+        - $ref: '#/components/parameters/GenreIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [year, -year]
+            default: -year
+          description: sort by year or -year (desc)
+      responses:
+        '200':
+          description: Paged list of movies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResponseOfMovies'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+
+  /api/savedmovie:
+    get:
+      summary: List movies saved by a user (and available in country)
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CountryParam'
+        - $ref: '#/components/parameters/UserIdParam'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [date_added, -date_added]
+            default: -date_added
+          description: sort by date_added or -date_added
+      responses:
+        '200':
+          description: Paged list of movies saved by the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResponseOfMovies'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+
+    post:
+      summary: Save a movie for a user in a country
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [country, user_id, movie_id]
+              properties:
+                country:
+                  type: string
+                  pattern: '^[A-Za-z]{2}$'
+                  description: ISO alpha-2
+                user_id:
+                  type: string
+                  format: uuid
+                movie_id:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Movie saved; returns movie detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MovieItem'
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '409':
+          $ref: '#/components/responses/409ConflictDuplicateSave'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntityUnavailable'
+
+    delete:
+      summary: Remove a saved movie for a user
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [user_id, movie_id]
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                movie_id:
+                  type: string
+                  format: uuid
+      responses:
+        '204':
+          description: Deleted (no content)
+        '400':
+          $ref: '#/components/responses/400BadRequest'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
