@@ -11,7 +11,7 @@ export abstract class BaseController {
     return res.status(vm.status).json({
       data: vm.data,
       page: vm.page,
-      page_sise: vm.page_size,
+      page_size: vm.page_size,
       total: vm.total,
       message: vm.message,
       returnId: vm.returnId,
@@ -121,7 +121,9 @@ export abstract class BaseController {
       isSuccess: false,
       status: statusCode,
     };
-    return this.sendSuccess(res, vm);
+    return res.status(vm.status).json({
+      ...vm
+    });
   }
 
   protected sendErrorBadRequest(req: Request, res: Response): Response {

@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { MessagesKey } from '../helpers/messages/messagesKey';
 import { MovieItem } from '../helpers/dtos/movie.dto';
 import {
+  BadRequest,
   DuplicateSaveError,
   NotFoundError,
   UnavailableInCountryError,
@@ -167,6 +168,15 @@ export class SavedMovieRepository {
         year: movie.year,
       };
     } catch (error) {
+      if (
+        error instanceof DuplicateSaveError ||
+        error instanceof UnavailableInCountryError ||
+        error instanceof NotFoundError ||
+        error instanceof BadRequest
+      ) {
+        throw error;
+      }
+
       if (error instanceof Error) {
         throw new Error(
           getMessage(req, MessagesKey.ERRORFINDINGALL) + ': ' + error.message,
@@ -177,9 +187,9 @@ export class SavedMovieRepository {
   }
 
   async removeSavedMovie(
-    req: Request, 
-    movieId: string, 
-    userId: string
+    req: Request,
+    movieId: string,
+    userId: string,
   ): Promise<void> {
     try {
       // 1. Ensure the movie is existed
@@ -193,9 +203,7 @@ export class SavedMovieRepository {
       });
 
       if (!movie) {
-        throw new NotFoundError(
-          `Movie with id ${movieId} is not found`,
-        );
+        throw new NotFoundError(`Movie with id ${movieId} is not found`);
       }
 
       await prisma.savedMovie.deleteMany({
@@ -205,6 +213,10 @@ export class SavedMovieRepository {
         },
       });
     } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+
       if (error instanceof Error) {
         throw new Error(
           getMessage(req, MessagesKey.ERRORFINDINGALL) + ': ' + error.message,

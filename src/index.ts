@@ -34,3 +34,5 @@ app.listen(PORT, () => {
 app.use('/api/genre', genreRoute);
 app.use('/api/movie', movieRoute);
 app.use('/api/savedmovie', savedMovieRoute);
+
+export default app;
