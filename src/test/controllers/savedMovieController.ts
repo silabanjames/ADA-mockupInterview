@@ -36,20 +36,16 @@ export async function createSavedMovie(req: Request, res: Response) {
         .status(409)
         .json({ error: { code: '409 DUPLICATE_SAVE', message: err.message } });
     if (err.name === 'UnavailableInCountryError')
-      return res
-        .status(422)
-        .json({
-          error: { code: 'UNAVAILABLE_IN_COUNTRY', message: err.message },
-        });
+      return res.status(422).json({
+        error: { code: 'UNAVAILABLE_IN_COUNTRY', message: err.message },
+      });
     if (err.name === 'NotFoundError')
       return res
         .status(404)
         .json({ error: { code: 'NOT_FOUND', message: err.message } });
-    return res
-      .status(500)
-      .json({
-        error: { code: 'INTERNAL_ERROR', message: String(err?.message || err) },
-      });
+    return res.status(500).json({
+      error: { code: 'INTERNAL_ERROR', message: String(err?.message || err) },
+    });
   }
 }
 

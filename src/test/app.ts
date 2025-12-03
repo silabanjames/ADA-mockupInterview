@@ -14,7 +14,8 @@ app.use(express.json());
 app.use((req, res, next) => {
   const key = req.header('x-api-key');
   const expected = process.env.TOKEN_SECRET || 'test-secret';
-  if (!key || key !== expected) return res.status(403).json({ message: 'Unauthorized.' });
+  if (!key || key !== expected)
+    return res.status(403).json({ message: 'Unauthorized.' });
   next();
 });
 

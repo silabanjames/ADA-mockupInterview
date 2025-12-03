@@ -22,19 +22,31 @@ export function resetMockDb() {
     { movieId: 'm-global', countryCode: 'ID' },
   ];
   saved = [
-    { userId: 'u1', movieId: 'm-us-1', dateAdded: new Date('2023-01-01T00:00:00Z') },
+    {
+      userId: 'u1',
+      movieId: 'm-us-1',
+      dateAdded: new Date('2023-01-01T00:00:00Z'),
+    },
   ];
 }
 
-export function getMovies() { return movies; }
-export function getAvailabilities() { return availabilities; }
-export function getSaved() { return saved; }
+export function getMovies() {
+  return movies;
+}
+export function getAvailabilities() {
+  return availabilities;
+}
+export function getSaved() {
+  return saved;
+}
 
 export function addSaved(userId: string, movieId: string, date?: Date) {
   saved.push({ userId, movieId, dateAdded: date ?? new Date() });
 }
 export function removeSaved(userId: string, movieId: string) {
-  const idx = saved.findIndex(s => s.userId === userId && s.movieId === movieId);
+  const idx = saved.findIndex(
+    (s) => s.userId === userId && s.movieId === movieId,
+  );
   if (idx !== -1) saved.splice(idx, 1);
 }
 
