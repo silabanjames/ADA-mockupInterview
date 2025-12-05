@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const savedMovie_controller_1 = require("../controllers/savedMovie.controller");
+const verifyToken_1 = require("../helpers/utility/verifyToken");
+const router = (0, express_1.Router)();
+const savedMovieController = new savedMovie_controller_1.SavedMovieController();
+router.get('/', verifyToken_1.verifyToken, (req, res) => savedMovieController.findAllSavedMoviesBasedCountryAndUser(req, res));
+router.post('/', verifyToken_1.verifyToken, (req, res) => savedMovieController.createSavedMovie(req, res));
+router.delete('/', verifyToken_1.verifyToken, (req, res) => savedMovieController.removeSavedMovie(req, res));
+exports.default = router;

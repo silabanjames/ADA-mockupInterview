@@ -58,6 +58,12 @@
   "include": [
     "src/**/*",
     "test/**/*",
-    "jest.config.ts"
+    "jest.config.ts",
+    "openapi.yaml",
+    "prisma/**/*",
+    "generated/**/*",
+  ],
+  "exclude": [
+    "*.config.js"
   ]
 }

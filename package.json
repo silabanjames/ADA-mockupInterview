@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "tsx --watch src/index.ts",
     "start": "node dist/index.js",
+    "build": "tsc",
     "test": "npx jest",
     "prisma:generate": "prisma generate",
     "migrate:create": "prisma migrate dev --create-only",
